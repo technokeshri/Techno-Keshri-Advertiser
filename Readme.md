@@ -26,13 +26,9 @@ A high-performance, futuristic landing page designed for **Techno Keshri**, a pr
 Since this is a single-file template for ease of deployment, the structure is contained within `index.html`:
 
 ```text
-index.html
-├── <head> (Meta tags, Google Fonts, CDN Links, CSS Styles)
-├── <body>
-│   ├── #canvas-container (Three.js WebGL Renderer)
-│   ├── .nav (Navigation Bar)
-│   ├── .hero (Main Landing Area)
-│   ├── .stats-strip (Key Performance Indicators)
-│   ├── .features (Service Grid)
-│   ├── .contact-container (Inquiry Form)
-│   └── <script> (Three.js Logic, GSAP Timelines, Event Listeners)
+project-folder/
+├── index.html
+├── css/
+│   └── style.css
+└── js/
+    └── script.js
