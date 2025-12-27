@@ -162,8 +162,18 @@
     </section>
 
     <footer>
-        <p>&copy; 2025 Techno Keshri. Premium Advertising Network. All Rights Reserved.</p>
-    </footer>
+<p id="footer"></p>
+
+<script>
+  // Get current date in IST
+  const options = { timeZone: "Asia/Kolkata" };
+  const now = new Date().toLocaleString("en-US", options);
+  const currentYear = new Date(now).getFullYear();
+
+  // Update footer text
+  document.getElementById("footer").innerHTML =
+    `&copy; ${currentYear} Techno Keshri. All Rights Reserved.`;
+</script>    </footer>
 <script src="script.js"></script>
 </body>
 </html>
