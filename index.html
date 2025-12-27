@@ -4,126 +4,166 @@
     <meta name="google-site-verification" content="wORHpFhNDmFTF-QGCkDz_JC89JMaDCrCYcHNkEQQPr0" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techno Keshri - Advertiser</title>
+    <title>Techno Keshri - Premium Ad Network</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
     <meta name='google-adsense-platform-domain' content='blogspot.com'/>
 </head>
 <body>
+    
+    <!-- 3D Interactive Background -->
+    <div id="canvas-container"></div>
+
     <nav class="nav">
         <a href="https://www.technokeshri.in/" class="logo">
-            <i class="fas fa-crown"></i>
-            <span>Techno Keshri</span>
+            <i class="fas fa-cube"></i> &nbsp;Techno Keshri
         </a>
-        <button class="menu-toggle" id="menuToggle">
-            <i class="fas fa-bars"></i>
-        </button>
+        <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
         <div class="nav-links" id="navLinks">
-            <a href="#" class="nav-link active">Home</a>
-            <a href="https://www.technokeshri.in" class="nav-link">Publisher</a>
+            <a href="#" class="nav-link">Home</a>
+            <a href="https://www.technokeshri.in" class="nav-link">For Publishers</a>
             <a href="https://www.technokeshri.in/p/contact-us.html" class="nav-link">Contact</a>
+            <a href="#contact" class="btn btn-primary" style="padding: 0.6rem 1.8rem; font-size: 0.9rem;">Start Now</a>
         </div>
     </nav>
 
     <section class="hero">
         <div class="hero-content">
-            <h1>Transform Your Brand with <span class="gradient-text">Premium Advertising</span></h1>
-            <p class="subtitle">Reach millions of engaged users with our premium advertising solutions. Maximize your ROI with targeted campaigns and measurable results.</p>
-            <a href="#" class="cta-btn" id="showCollaborationForm">Get Started Now</a>
+            <h1>Future of Advertising<br><span class="gradient-text">Is Here</span></h1>
+            <p class="subtitle">Join the premium network that connects visionary brands with engaged global audiences. AI-driven optimization for maximum ROI.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="#contact" class="btn btn-primary">
+                    Launch Campaign <i class="fas fa-rocket"></i>
+                </a>
+                <a href="https://technokeshri.in" class="btn" style="border: 1px solid rgba(255,255,255,0.3); color: white; background: rgba(0,0,0,0.4);">
+                    Monetize Traffic
+                </a>
+            </div>
         </div>
     </section>
 
-    <div style="text-align: center; margin: 3rem 0;">
-        <h2 class="section-title">Our Advertising Solutions</h2>
+    <div class="stats-strip">
+        <div class="stat-item">
+            <h4>100+</h4>
+            <p>Countries Reached</p>
+        </div>
+        <div class="stat-item">
+            <h4>₹100</h4>
+            <p>Starting CPM (IN)</p>
+        </div>
+        <div class="stat-item">
+            <h4>24/7</h4>
+            <p>Expert Support</p>
+        </div>
+        <div class="stat-item">
+            <h4>$1.0</h4>
+            <p>Global CPM Base</p>
+        </div>
     </div>
 
+    <section class="section-header">
+        <span class="section-tag">Why Choose Us</span>
+        <h2 class="section-title">Engineered for Growth</h2>
+    </section>
+
     <section class="features">
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-globe-americas"></i></div>
-            <h3>Global Reach</h3>
-            <p>Target audiences worldwide with precision targeting across continents and demographics.</p>
+        <div class="card">
+            <div class="icon-box"><i class="fas fa-bullseye"></i></div>
+            <h3>Precision Targeting</h3>
+            <p>Reach the exact audience you need. Filter by geography, device, interest, and behavior using our advanced data layers.</p>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-ad"></i></div>
-            <h3>Multiple Formats</h3>
-            <p>Choose from banners, native ads, sponsored content, video ads, and interactive formats.</p>
+        <div class="card">
+            <div class="icon-box"><i class="fas fa-magic"></i></div>
+            <h3>Creative Formats</h3>
+            <p>Go beyond banners. Engage users with high-impact video, native, and interactive ad units designed for modern browsing.</p>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
-            <h3>Performance Tracking</h3>
-            <p>Real-time analytics dashboard to measure, analyze and optimize campaigns for maximum ROI.</p>
+        <div class="card">
+            <div class="icon-box"><i class="fas fa-chart-bar"></i></div>
+            <h3>Real-Time Analytics</h3>
+            <p>Watch your campaign perform live. Our dashboard gives you granular insights to optimize spend and maximize conversions.</p>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-            <h3>Brand Safety</h3>
-            <p>Premium placements with verified partners and strict content guidelines for your brand's protection.</p>
+        <div class="card">
+            <div class="icon-box"><i class="fas fa-shield-virus"></i></div>
+            <h3>Brand Safety First</h3>
+            <p>We use proprietary tech to ensure your ads only appear on verified, high-quality publisher sites. Zero tolerance for bot traffic.</p>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-            <h3>High Conversions</h3>
-            <p>Optimized ad placements that drive engagement and conversions for your business goals.</p>
+        <!-- New Cards -->
+        <div class="card">
+            <div class="icon-box"><i class="fas fa-robot"></i></div>
+            <h3>AI Optimization</h3>
+            <p>Maximize your ROI with intelligent algorithms that automatically adjust bids and placements for peak performance.</p>
         </div>
-        <div class="feature-card">
-            <div class="feature-icon"><i class="fas fa-headset"></i></div>
-            <h3>Dedicated Support</h3>
-            <p>Personal account manager and 24/7 support to ensure your advertising success.</p>
-        </div>
-    </section>
-
-    <section class="pricing">
-        <h2 class="section-title">Simple, Transparent Pricing</h2>
-        <div class="price-tag">India: Starting from ₹100 CPM</div>
-        <div class="price-tag">Global: Starting from $1 CPM</div>
-        <p style="margin-top: 2rem; font-size: 1.1rem; color: var(--gray);">Custom packages available for large campaigns with volume discounts</p>
-        <a href="#" class="cta-btn" id="showCollaborationForm2">Get Started Now</a>
-    </section>
-
-    <section class="cta-section">
-        <div class="cta-content">
-            <h2>Start Advertising Today!</h2>
-            <p>Get instant access to our premium advertising network and start reaching your target audience effectively.</p>
-            <a href="https://www.technokeshri.in/p/contact-us.html" class="cta-btn">Contact Us Now</a>
+        <div class="card">
+            <div class="icon-box"><i class="fas fa-headset"></i></div>
+            <h3>24/7 Expert Support</h3>
+            <p>Never fly solo. Our dedicated ad-ops team is available around the clock to help you troubleshoot and scale.</p>
         </div>
     </section>
 
-    <section class="contact-form" id="collaborationForm">
-        <h3>Collaborate With Us</h3>
-        <form id="emailForm">
-            <div class="form-group">
-                <label for="name">Your Name</label>
-                <input type="text" id="name" required placeholder="Enter your name">
-            </div>
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" required placeholder="Enter your email">
-            </div>
-            <div class="form-group">
-                <label for="business">Business Type</label>
-                <input type="text" id="business" required placeholder="Describe your business">
-            </div>
-            <div class="form-group">
-                <label for="budget">Budget Range</label>
-                <select id="budget" required>
-                    <option value="" disabled selected>Select your budget</option>
-                    <option value="Under ₹10,000">Under ₹10,000</option>
-                    <option value="₹10,000 - ₹50,000">₹10,000 - ₹50,000</option>
-                    <option value="₹50,000 - ₹2,00,000">₹50,000 - ₹2,00,000</option>
-                    <option value="Over ₹2,00,000">Over ₹2,00,000</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="message">Your Message</label>
-                <textarea id="message" required>We’re interested in exploring how you can support us in promoting our services, building a stronger online presence, or running paid campaigns to reach our target audience. Thank you.</textarea>
-            </div>
-            <button type="submit" class="send-email-btn">Send Inquiry</button>
-        </form>
+    <section class="contact-container" id="contact">
+        <div class="section-header" style="margin-bottom: 3rem;">
+            <span class="section-tag">Get In Touch</span>
+            <h2 class="section-title">Start Your Campaign</h2>
+        </div>
+        
+        <div class="form-box">
+            <form id="emailForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Jane Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="jane@company.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Company / Website</label>
+                    <input type="text" id="business" class="form-control" placeholder="Your Business Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Budget Estimate</label>
+                    <select id="budget" class="form-control" required>
+                        <option value="" disabled selected>Select Monthly Budget</option>
+                        <option value="Starter (< ₹10k)">Starter (< ₹10k)</option>
+                        <option value="Growth (₹10k - ₹50k)">Growth (₹10k - ₹50k)</option>
+                        <option value="Scale (₹50k - ₹2L)">Scale (₹50k - ₹2L)</option>
+                        <option value="Enterprise (> ₹2L)">Enterprise (> ₹2L)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="message" class="form-control" placeholder="Tell us about your campaign goals...">We’re interested in exploring how you can support us in promoting our services, building a stronger online presence, or running paid campaigns to reach our target audience.</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    Send Request
+                </button>
+            </form>
+        </div>
     </section>
 
-    <footer class="footer">
-        <p>© 2025 Techno Keshri. All Rights Reserved.</p>
+    <footer>
+        <p>&copy; 2025 Techno Keshri. Premium Advertising Network. All Rights Reserved.</p>
     </footer>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
