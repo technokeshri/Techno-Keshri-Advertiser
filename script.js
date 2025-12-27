@@ -1,388 +1,243 @@
-:root {
-            /* Dark Theme Palette */
-            --bg-color: #020205; 
-            --primary: #00f2ff; /* Brighter Cyan */
-            --primary-glow: rgba(0, 242, 255, 0.6);
-            --secondary: #4361ee;
-            --accent: #ff007a; /* Neon Pink */
-            --accent-glow: rgba(255, 0, 122, 0.6);
+// --- THREE.JS CYBER-GRID BACKGROUND ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
             
-            --text-main: #ffffff;
-            --text-muted: #e2e8f0; /* Brighter muted text for better visibility */
-            
-            /* Darker glass for better text contrast */
-            --glass-bg: rgba(15, 15, 20, 0.85); 
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --card-hover-bg: rgba(30, 30, 45, 0.95);
-            
-            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
+            // 1. Dark Fog for depth (matches background)
+            scene.fog = new THREE.FogExp2(0x020205, 0.035);
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Outfit', sans-serif;
-        }
+            // 2. Camera
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 8;
+            camera.position.y = 3;
+            camera.rotation.x = -0.3;
 
-        h1, h2, h3, .logo {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+            // 3. Renderer
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
 
-        body {
-            background-color: var(--bg-color);
-            /* Subtle vignette to focus center */
-            background-image: radial-gradient(circle at center, transparent 0%, #000000 100%);
-            color: var(--text-main);
-            line-height: 1.6;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
+            // --- 4. ENHANCED BLOCKS: WIREFRAME + MESH ---
+            const blockGroup = new THREE.Group();
+            scene.add(blockGroup);
 
-        /* 3D Canvas */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: -1;
-        }
+            // Base Geometry
+            const geometry = new THREE.BoxGeometry(0.85, 0.85, 0.85);
+            const edges = new THREE.EdgesGeometry(geometry); // Create wireframe edges
 
-        /* Navbar */
-        .nav {
-            padding: 1.5rem 5%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+            // Materials
+            // Inner core material (Solid Dark)
+            const coreMaterial = new THREE.MeshStandardMaterial({
+                color: 0x050510,
+                roughness: 0.1,
+                metalness: 0.9,
+            });
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: var(--text-main);
-            text-decoration: none;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
-        }
+            // Wireframe Edge Material (Glowing Cyan)
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0x00f2ff, // Cyan
+                transparent: true,
+                opacity: 0.3 // Subtle by default
+            });
 
-        .logo i {
-            color: var(--primary);
-            filter: drop-shadow(0 0 8px var(--primary));
-        }
+            const rows = 20;
+            const cols = 30;
+            const blocks = [];
 
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-        }
+            // Generate Grid
+            for(let i = 0; i < rows; i++) {
+                for(let j = 0; j < cols; j++) {
+                    // Create Group for specific block unit
+                    const unit = new THREE.Group();
 
-        .nav-link {
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: var(--transition);
-            position: relative;
-        }
+                    // 1. Solid Inner Cube
+                    const mesh = new THREE.Mesh(geometry, coreMaterial.clone());
+                    unit.add(mesh);
 
-        .nav-link:hover {
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary-glow);
-        }
+                    // 2. Glowing Wireframe
+                    const lines = new THREE.LineSegments(edges, lineMaterial.clone());
+                    unit.add(lines);
 
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
+                    // Position
+                    const x = (j - cols/2) * 1.1;
+                    const z = (i - rows/2) * 1.1;
+                    
+                    // Initial wavy position
+                    const y = Math.sin(x * 0.2) * Math.cos(z * 0.2);
 
-        /* Hero Section */
-        .hero {
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0 5%;
-            position: relative;
-        }
+                    unit.position.set(x, -3 + y, z - 5);
+                    
+                    // Store data for animation
+                    unit.userData = {
+                        initialY: -3 + y,
+                        x: x,
+                        z: z - 5,
+                        timer: 0,
+                        mesh: mesh,
+                        lines: lines
+                    };
 
-        .hero-content {
-            max-width: 1000px;
-            z-index: 2;
-            /* Added backdrop for extreme readability */
-            background: radial-gradient(closest-side, rgba(0,0,0,0.6) 0%, transparent 100%); 
-            padding: 2rem;
-        }
-
-        h1 {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            letter-spacing: -2px;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.8); /* Heavy shadow for contrast */
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, #fff 20%, var(--primary) 60%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-            filter: drop-shadow(0 0 25px rgba(0, 242, 255, 0.4));
-        }
-
-        .subtitle {
-            font-size: 1.4rem;
-            color: #e2e8f0; /* Very light gray */
-            margin: 0 auto 3rem;
-            max-width: 650px;
-            font-weight: 400;
-            text-shadow: 0 2px 10px rgba(0,0,0,1); /* Shadow against busy background */
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 1rem 2.8rem;
-            border-radius: 50px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: var(--transition);
-            font-size: 1.1rem;
-            cursor: pointer;
-            border: 1px solid transparent;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
-            color: white;
-            box-shadow: 0 0 20px rgba(67, 97, 238, 0.4);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.6);
-            border-color: white;
-        }
-
-        /* Features Grid */
-        .section-header {
-            text-align: center;
-            margin: 8rem 0 4rem;
-        }
-
-        .section-tag {
-            color: var(--primary);
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            display: block;
-            text-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .section-title {
-            font-size: 3rem;
-            font-weight: 700;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2rem;
-            padding: 0 5% 4rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 3rem 2rem;
-            border-radius: 20px;
-            transition: var(--transition);
-            backdrop-filter: blur(12px); /* Stronger blur */
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .card:hover {
-            background: var(--card-hover-bg);
-            transform: translateY(-10px);
-            border-color: var(--primary);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
-        }
-
-        .icon-box {
-            width: 60px;
-            height: 60px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-            color: var(--primary);
-            transition: var(--transition);
-        }
-
-        .card:hover .icon-box {
-            background: var(--primary);
-            color: #000;
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: white;
-            font-weight: 700;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.7;
-        }
-
-        /* Stats/Pricing Strip */
-        .stats-strip {
-            background: rgba(10, 10, 15, 0.9);
-            border-top: 1px solid var(--glass-border);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 4rem 5%;
-            margin: 4rem 0;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 4rem;
-            text-align: center;
-            position: relative;
-            z-index: 10;
-        }
-
-        .stat-item h4 {
-            font-size: 3rem;
-            background: linear-gradient(to bottom, #fff, var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-            font-weight: 800;
-        }
-
-        .stat-item p {
-            color: #cbd5e1;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        /* Contact Section */
-        .contact-container {
-            max-width: 800px;
-            margin: 6rem auto;
-            padding: 0 5%;
-        }
-
-        .form-box {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 3.5rem;
-            border-radius: 24px;
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.8rem;
-            color: white;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-
-        .form-control {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 1.2rem;
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            transition: var(--transition);
-            outline: none;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
-        }
-
-        textarea.form-control {
-            min-height: 150px;
-            resize: vertical;
-        }
-
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 4rem 5%;
-            background: #000;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 { font-size: 3rem; }
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                width: 85%;
-                height: 100vh;
-                background: #050505;
-                flex-direction: column;
-                padding: 100px 2rem;
-                transition: 0.3s ease;
-                border-left: 1px solid var(--glass-border);
-                z-index: 999;
+                    blockGroup.add(unit);
+                    blocks.push(unit);
+                }
             }
-            .nav-links.active { right: 0; }
-            .menu-toggle { display: block; z-index: 1001; }
-            .stats-strip { gap: 2rem; }
-            .form-box { padding: 2rem; }
-        }
+
+            // 5. Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambientLight);
+
+            // Dynamic Point Lights
+            const blueLight = new THREE.PointLight(0x00f2ff, 1.5, 60);
+            blueLight.position.set(10, 10, 0);
+            scene.add(blueLight);
+
+            const pinkLight = new THREE.PointLight(0xff007a, 1.5, 60);
+            pinkLight.position.set(-10, 5, 0);
+            scene.add(pinkLight);
+
+            // 6. Raycaster
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2(-999, -999);
+            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 3);
+
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            // 7. Animation Loop
+            const clock = new THREE.Clock();
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+
+                // Gentle block movement
+                blocks.forEach(unit => {
+                    const data = unit.userData;
+                    
+                    // Wave calculation
+                    const waveY = Math.sin(data.x * 0.3 + time * 0.5) * Math.cos(data.z * 0.3 + time * 0.3) * 0.3;
+                    
+                    // Interactive Rise Logic
+                    let interactY = 0;
+                    if(data.timer > 0) {
+                        data.timer -= 0.02; // Fade out
+                        interactY = Math.sin(data.timer * Math.PI) * 1.2; // Bump up
+                        
+                        // GLOW EFFECT ON ACTIVE
+                        // Make wireframe bright
+                        data.lines.material.opacity = 0.3 + (data.timer * 0.7); 
+                        data.lines.material.color.setHex(0x00f2ff);
+                        
+                        // Make core slightly emissive
+                        data.mesh.material.emissive.setHex(0x00f2ff);
+                        data.mesh.material.emissiveIntensity = data.timer * 0.5;
+
+                    } else {
+                        // Return to idle state
+                        data.lines.material.opacity = 0.15; // Dim wireframe
+                        data.lines.material.color.setHex(0x4361ee); // Darker blue idle
+                        data.mesh.material.emissiveIntensity = 0;
+                    }
+
+                    unit.position.y = data.initialY + waveY + interactY;
+                    unit.rotation.x = interactY * 0.1;
+                    unit.rotation.z = interactY * 0.05;
+                });
+
+                // Raycasting
+                raycaster.setFromCamera(mouse, camera);
+                const target = new THREE.Vector3(); 
+                raycaster.ray.intersectPlane(plane, target);
+
+                if(target) {
+                    blocks.forEach(unit => {
+                        const dx = unit.position.x - target.x;
+                        const dz = unit.position.z - target.z;
+                        const dist = Math.sqrt(dx*dx + dz*dz);
+                        
+                        if(dist < 3.0) {
+                            unit.userData.timer = 1.0;
+                        }
+                    });
+                    
+                    // Light follows mouse
+                    blueLight.position.x += (target.x - blueLight.position.x) * 0.1;
+                    blueLight.position.z += ((target.z + 5) - blueLight.position.z) * 0.1;
+                }
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // --- GSAP ANIMATIONS ---
+        const initGSAP = () => {
+            gsap.registerPlugin(ScrollTrigger);
+
+            const tl = gsap.timeline();
+            tl.from("h1", { y: 50, opacity: 0, duration: 1, ease: "power4.out" })
+              .from(".subtitle", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
+              .from(".hero .btn", { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 }, "-=0.4");
+
+            gsap.from(".stat-item", {
+                scrollTrigger: { trigger: ".stats-strip", start: "top 85%" },
+                y: 30, opacity: 0, duration: 0.8, stagger: 0.1
+            });
+
+            gsap.utils.toArray(".card").forEach((card, i) => {
+                gsap.from(card, {
+                    scrollTrigger: { trigger: ".features", start: "top 80%" },
+                    y: 50, opacity: 0, duration: 0.6, delay: i * 0.1
+                });
+            });
+
+            gsap.from(".form-box", {
+                scrollTrigger: { trigger: ".form-box", start: "top 80%" },
+                scale: 0.95, opacity: 0, duration: 0.8
+            });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            initGSAP();
+
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+            menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    navLinks.classList.remove('active');
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if(target) {
+                        gsap.to(window, {duration: 1, scrollTo: target, ease: "power3.inOut"});
+                    }
+                });
+            });
+
+            const form = document.getElementById('emailForm');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const business = document.getElementById('business').value;
+                const budget = document.getElementById('budget').value;
+                const message = document.getElementById('message').value;
+
+                const subject = `Campaign Inquiry: ${business}`;
+                const body = `Name: ${name}\nEmail: ${email}\nBusiness: ${business}\nBudget: ${budget}\n\nMessage:\n${message}`;
+                
+                window.location.href = `mailto:business@technokeshri.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            });
+        });
