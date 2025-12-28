@@ -1,177 +1,244 @@
-// --- THREE.JS CYBER-GRID BACKGROUND ---
+ // Set current year based on Indian Time Zone (IST)
+        const date = new Date();
+        const options = { timeZone: 'Asia/Kolkata', year: 'numeric' };
+        document.getElementById('year').textContent = new Intl.DateTimeFormat('en-US', options).format(date);
+
+        // Auto-detect Currency based on Region selection and User Timezone
+        const regionSelect = document.getElementById('region');
+        const currencySelect = document.getElementById('currency');
+
+        // 1. Initial check: If user is in India (via timezone), default to India/INR
+        if (Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Kolkata') {
+            regionSelect.value = 'India';
+            currencySelect.value = 'INR';
+        }
+
+        // 2. Listener: Auto-switch currency when Region changes
+        regionSelect.addEventListener('change', function() {
+            if (this.value === 'India') {
+                currencySelect.value = 'INR';
+            } else {
+                currencySelect.value = 'USD';
+            }
+        });
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Form Handling
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const company = document.getElementById('company').value;
+            const budget = document.getElementById('budget').value;
+            const currency = document.getElementById('currency').value; // Get currency
+            const region = document.getElementById('region').value;
+            // New fields
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            const essentials = document.getElementById('essentials').value;
+            
+            const subject = encodeURIComponent(`Advertiser Inquiry: ${company}`);
+            const body = encodeURIComponent(
+                `Name: ${name}\n` +
+                `Company: ${company}\n` +
+                `Estimated Budget: ${currency} ${budget}\n` + // Format: USD 5000
+                `Target Region: ${region}\n` +
+                (email ? `Email: ${email}\n` : '') +
+                (phone ? `Phone: ${phone}\n` : '') +
+                `\nCampaign Essentials:\n${essentials}`
+            );
+            
+            window.location.href = `mailto:business@technokeshri.in?subject=${subject}&body=${body}`;
+        }
+
+        // --- WATER RIPPLE EFFECT ---
+        const initRipples = () => {
+            const canvas = document.getElementById('ripple-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let ripples = [];
+
+            // Resize
+            const resize = () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Ripple Class
+            class Ripple {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = 0;
+                    this.maxRadius = 50; // Max size of ripple
+                    this.alpha = 1;
+                    this.speed = 1.5;
+                }
+
+                update() {
+                    this.radius += this.speed;
+                    this.alpha -= 0.02; // Fade out speed
+                }
+
+                draw(ctx) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    // Blue-ish ripple
+                    ctx.strokeStyle = `rgba(59, 130, 246, ${this.alpha})`; 
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+
+            // Create ripple on mouse move
+            let lastX = 0;
+            let lastY = 0;
+            const distanceThreshold = 20; // Only create ripple if mouse moved enough
+
+            window.addEventListener('mousemove', (e) => {
+                const dist = Math.hypot(e.clientX - lastX, e.clientY - lastY);
+                if (dist > distanceThreshold) {
+                    ripples.push(new Ripple(e.clientX, e.clientY));
+                    lastX = e.clientX;
+                    lastY = e.clientY;
+                }
+            });
+
+            // Animate
+            const animateRipples = () => {
+                ctx.clearRect(0, 0, width, height);
+                
+                for (let i = 0; i < ripples.length; i++) {
+                    ripples[i].update();
+                    ripples[i].draw(ctx);
+                    
+                    // Remove dead ripples
+                    if (ripples[i].alpha <= 0) {
+                        ripples.splice(i, 1);
+                        i--;
+                    }
+                }
+                requestAnimationFrame(animateRipples);
+            };
+            animateRipples();
+        };
+
+        // --- THREE.JS ANIMATION ---
         const initThreeJS = () => {
             const container = document.getElementById('canvas-container');
-            const scene = new THREE.Scene();
             
-            // 1. Dark Fog for depth (matches background)
-            scene.fog = new THREE.FogExp2(0x020205, 0.035);
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x020617, 0.002); // Matched new bg color
 
-            // 2. Camera
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 8;
-            camera.position.y = 3;
-            camera.rotation.x = -0.3;
+            camera.position.z = 50;
 
-            // 3. Renderer
             const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            // --- 4. ENHANCED BLOCKS: WIREFRAME + MESH ---
-            const blockGroup = new THREE.Group();
-            scene.add(blockGroup);
+            // Particles
+            const geometry = new THREE.BufferGeometry();
+            const particlesCount = 400; // Increased count
+            const posArray = new Float32Array(particlesCount * 3);
 
-            // Base Geometry
-            const geometry = new THREE.BoxGeometry(0.85, 0.85, 0.85);
-            const edges = new THREE.EdgesGeometry(geometry); // Create wireframe edges
-
-            // Materials
-            // Inner core material (Solid Dark)
-            const coreMaterial = new THREE.MeshStandardMaterial({
-                color: 0x050510,
-                roughness: 0.1,
-                metalness: 0.9,
-            });
-
-            // Wireframe Edge Material (Glowing Cyan)
-            const lineMaterial = new THREE.LineBasicMaterial({
-                color: 0x00f2ff, // Cyan
-                transparent: true,
-                opacity: 0.3 // Subtle by default
-            });
-
-            const rows = 20;
-            const cols = 30;
-            const blocks = [];
-
-            // Generate Grid
-            for(let i = 0; i < rows; i++) {
-                for(let j = 0; j < cols; j++) {
-                    // Create Group for specific block unit
-                    const unit = new THREE.Group();
-
-                    // 1. Solid Inner Cube
-                    const mesh = new THREE.Mesh(geometry, coreMaterial.clone());
-                    unit.add(mesh);
-
-                    // 2. Glowing Wireframe
-                    const lines = new THREE.LineSegments(edges, lineMaterial.clone());
-                    unit.add(lines);
-
-                    // Position
-                    const x = (j - cols/2) * 1.1;
-                    const z = (i - rows/2) * 1.1;
-                    
-                    // Initial wavy position
-                    const y = Math.sin(x * 0.2) * Math.cos(z * 0.2);
-
-                    unit.position.set(x, -3 + y, z - 5);
-                    
-                    // Store data for animation
-                    unit.userData = {
-                        initialY: -3 + y,
-                        x: x,
-                        z: z - 5,
-                        timer: 0,
-                        mesh: mesh,
-                        lines: lines
-                    };
-
-                    blockGroup.add(unit);
-                    blocks.push(unit);
-                }
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 160; 
             }
 
-            // 5. Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
-            scene.add(ambientLight);
+            geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-            // Dynamic Point Lights
-            const blueLight = new THREE.PointLight(0x00f2ff, 1.5, 60);
-            blueLight.position.set(10, 10, 0);
-            scene.add(blueLight);
-
-            const pinkLight = new THREE.PointLight(0xff007a, 1.5, 60);
-            pinkLight.position.set(-10, 5, 0);
-            scene.add(pinkLight);
-
-            // 6. Raycaster
-            const raycaster = new THREE.Raycaster();
-            const mouse = new THREE.Vector2(-999, -999);
-            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 3);
-
-            window.addEventListener('mousemove', (e) => {
-                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            const material = new THREE.PointsMaterial({
+                size: 0.5,
+                color: 0x3b82f6,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
             });
 
-            // 7. Animation Loop
+            const particlesMesh = new THREE.Points(geometry, material);
+            scene.add(particlesMesh);
+
+            // Connected Lines
+            const linesMaterial = new THREE.LineBasicMaterial({
+                color: 0x3b82f6,
+                transparent: true,
+                opacity: 0.1
+            });
+            const linesGeometry = new THREE.BufferGeometry(); // Dynamic
+            const linesMesh = new THREE.LineSegments(linesGeometry, linesMaterial);
+            scene.add(linesMesh);
+
+            // Animation Loop
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetX = 0;
+            let targetY = 0;
+            const windowHalfX = window.innerWidth / 2;
+            const windowHalfY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX - windowHalfX);
+                mouseY = (event.clientY - windowHalfY);
+            });
+
             const clock = new THREE.Clock();
 
             const animate = () => {
                 requestAnimationFrame(animate);
-                const time = clock.getElapsedTime();
+                const elapsedTime = clock.getElapsedTime();
 
-                // Gentle block movement
-                blocks.forEach(unit => {
-                    const data = unit.userData;
-                    
-                    // Wave calculation
-                    const waveY = Math.sin(data.x * 0.3 + time * 0.5) * Math.cos(data.z * 0.3 + time * 0.3) * 0.3;
-                    
-                    // Interactive Rise Logic
-                    let interactY = 0;
-                    if(data.timer > 0) {
-                        data.timer -= 0.02; // Fade out
-                        interactY = Math.sin(data.timer * Math.PI) * 1.2; // Bump up
-                        
-                        // GLOW EFFECT ON ACTIVE
-                        // Make wireframe bright
-                        data.lines.material.opacity = 0.3 + (data.timer * 0.7); 
-                        data.lines.material.color.setHex(0x00f2ff);
-                        
-                        // Make core slightly emissive
-                        data.mesh.material.emissive.setHex(0x00f2ff);
-                        data.mesh.material.emissiveIntensity = data.timer * 0.5;
+                targetX = mouseX * 0.001;
+                targetY = mouseY * 0.001;
 
-                    } else {
-                        // Return to idle state
-                        data.lines.material.opacity = 0.15; // Dim wireframe
-                        data.lines.material.color.setHex(0x4361ee); // Darker blue idle
-                        data.mesh.material.emissiveIntensity = 0;
-                    }
+                particlesMesh.rotation.y += 0.001;
+                particlesMesh.rotation.x += 0.0005;
+                particlesMesh.rotation.y += 0.03 * (targetX - particlesMesh.rotation.y);
+                particlesMesh.rotation.x += 0.03 * (targetY - particlesMesh.rotation.x);
 
-                    unit.position.y = data.initialY + waveY + interactY;
-                    unit.rotation.x = interactY * 0.1;
-                    unit.rotation.z = interactY * 0.05;
-                });
-
-                // Raycasting
-                raycaster.setFromCamera(mouse, camera);
-                const target = new THREE.Vector3(); 
-                raycaster.ray.intersectPlane(plane, target);
-
-                if(target) {
-                    blocks.forEach(unit => {
-                        const dx = unit.position.x - target.x;
-                        const dz = unit.position.z - target.z;
-                        const dist = Math.sqrt(dx*dx + dz*dz);
-                        
-                        if(dist < 3.0) {
-                            unit.userData.timer = 1.0;
-                        }
-                    });
-                    
-                    // Light follows mouse
-                    blueLight.position.x += (target.x - blueLight.position.x) * 0.1;
-                    blueLight.position.z += ((target.z + 5) - blueLight.position.z) * 0.1;
+                // Wave motion
+                const positions = particlesMesh.geometry.attributes.position.array;
+                for(let i = 0; i < particlesCount; i++) {
+                    const i3 = i * 3;
+                    // Complex wave
+                    positions[i3 + 1] += Math.sin(elapsedTime + positions[i3]) * 0.03;
                 }
-
+                particlesMesh.geometry.attributes.position.needsUpdate = true;
+                
                 renderer.render(scene, camera);
             };
 
-            animate();
+            // Global Mesh
+            const sphereGeo = new THREE.IcosahedronGeometry(25, 1);
+            const sphereMat = new THREE.MeshBasicMaterial({ 
+                color: 0x8b5cf6, 
+                wireframe: true,
+                transparent: true,
+                opacity: 0.03
+            });
+            const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+            scene.add(sphere);
+
+            // Hook sphere into animation
+            const originalAnimate = animate;
+            const newAnimate = () => {
+                sphere.rotation.y -= 0.003;
+                sphere.rotation.x += 0.002;
+                originalAnimate();
+            }
+            
+            newAnimate();
 
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
@@ -180,64 +247,8 @@
             });
         };
 
-        // --- GSAP ANIMATIONS ---
-        const initGSAP = () => {
-            gsap.registerPlugin(ScrollTrigger);
-
-            const tl = gsap.timeline();
-            tl.from("h1", { y: 50, opacity: 0, duration: 1, ease: "power4.out" })
-              .from(".subtitle", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
-              .from(".hero .btn", { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 }, "-=0.4");
-
-            gsap.from(".stat-item", {
-                scrollTrigger: { trigger: ".stats-strip", start: "top 85%" },
-                y: 30, opacity: 0, duration: 0.8, stagger: 0.1
-            });
-
-            gsap.utils.toArray(".card").forEach((card, i) => {
-                gsap.from(card, {
-                    scrollTrigger: { trigger: ".features", start: "top 80%" },
-                    y: 50, opacity: 0, duration: 0.6, delay: i * 0.1
-                });
-            });
-
-            gsap.from(".form-box", {
-                scrollTrigger: { trigger: ".form-box", start: "top 80%" },
-                scale: 0.95, opacity: 0, duration: 0.8
-            });
-        };
-
+        // Initialize Everything
         document.addEventListener('DOMContentLoaded', () => {
             initThreeJS();
-            initGSAP();
-
-            const menuToggle = document.getElementById('menuToggle');
-            const navLinks = document.getElementById('navLinks');
-            menuToggle.addEventListener('click', () => navLinks.classList.toggle('active'));
-
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    navLinks.classList.remove('active');
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if(target) {
-                        gsap.to(window, {duration: 1, scrollTo: target, ease: "power3.inOut"});
-                    }
-                });
-            });
-
-            const form = document.getElementById('emailForm');
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const business = document.getElementById('business').value;
-                const budget = document.getElementById('budget').value;
-                const message = document.getElementById('message').value;
-
-                const subject = `Campaign Inquiry: ${business}`;
-                const body = `Name: ${name}\nEmail: ${email}\nBusiness: ${business}\nBudget: ${budget}\n\nMessage:\n${message}`;
-                
-                window.location.href = `mailto:business@technokeshri.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            });
+            initRipples();
         });
